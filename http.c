@@ -80,50 +80,50 @@ void handle_socket(int fd)
 		{
 			fptr = fopen("index.html","r");
 					 
-					if(!fptr)
-					{
-						sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root %s</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
-						write(fd,buffer,strlen(buffer));
-						exit(3);
-					}
+			if(!fptr)
+			{
+				sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root %s</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
+				write(fd,buffer,strlen(buffer));
+				exit(1);
+			}
 				
-					sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
-					write(fd,buffer,strlen(buffer));
-					while ((ret=fread(&buffer, 1,BUFSIZE ,fptr))>0) {
-					write(fd,buffer,ret);
-					}
-					fclose(fptr);
-					exit(1);
-				
-		}
-		else
-		{
-			sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf[fNLen-2]);
+			sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
 			write(fd,buffer,strlen(buffer));
+			while ((ret=fread(&buffer, 1,BUFSIZE ,fptr))>0) {
+			write(fd,buffer,ret);
+			}
+			fclose(fptr);
 			exit(1);
-		}
-		/*else if(fNameBuf[fNLen-2]=='/')
-		{
-			strncpy(fNameBufAppend,fNameBuf,1000);
-			strcat(fNameBufAppend,"/index.html");
-			fptr = fopen(fNameBufAppend,"r");
-					 
-					if(!fptr)
-					{
-						sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found dir index</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
-						write(fd,buffer,strlen(buffer));
-						exit(3);
-					}
 				
-					sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
-					write(fd,buffer,strlen(buffer));
-					 while ((ret=fread( buffer, BUFSIZE,1 ,fptr))>0) {
-					write(fd,buffer,ret);
-					}
-					fclose(fptr);
-					exit(1);
 		}
 		
+		else if(fNameBuf[fNLen-1]=='/')
+		{
+			strncpy(fNameBufAppend,fNameBuf,1000);
+			strcat(fNameBufAppend,"index.html");
+			fptr = fopen(fNameBufAppend,"r");
+			
+			if(!fptr)
+			{
+				sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
+				write(fd,buffer,strlen(buffer));
+				exit(1);
+			}
+				
+			sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
+			write(fd,buffer,strlen(buffer));
+			while ((ret=fread(&buffer, 1,BUFSIZE ,fptr))>0) {
+			write(fd,buffer,ret);
+			}
+			fclose(fptr);
+			exit(1);
+		}
+		/*else
+		{
+			sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
+			write(fd,buffer,strlen(buffer));
+			exit(1);
+		}*/
 		else
 		{
 		//  printf("Filename : %s \n",fname);
@@ -133,8 +133,8 @@ void handle_socket(int fd)
 				if (S_ISDIR(st.st_mode))
 				{
 					//printf("This is a directory.\n");
-					//sprintf(buffer,"HTTP/1.0 301 Moved Permanently\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nLocation: %s/\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
-					sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found dir</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
+					sprintf(buffer,"HTTP/1.0 301 Moved Permanently\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nLocation: %s/\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
+					//sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found dir</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
 						write(fd,buffer,strlen(buffer));
 					exit(1);
 				}
@@ -142,7 +142,7 @@ void handle_socket(int fd)
 			
 				else if(S_ISREG(st.st_mode)) //this name is a file
 				{
-					//printf("a file\n");
+					/*//printf("a file\n");
 					fptr = fopen(fNameBuf,"r");
 					 
 					if(!fptr)
@@ -156,21 +156,23 @@ void handle_socket(int fd)
 					sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
 					write(fd,buffer,strlen(buffer));
 					fclose(fptr);
+					exit(1);*/
+					sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
+					write(fd,buffer,strlen(buffer));
 					exit(1);
-				
 				 }
 			}
 			else
 			{
-				sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found %s</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
+				sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found : Can't get file %s</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
 				write(fd,buffer,strlen(buffer));
 				exit(1);
 			}
 			 
 		}
-	sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>nothing final</b>\r\n" );
-	write(fd,buffer,strlen(buffer));
-	*/
+	/*sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>nothing final</b>\r\n" );
+	write(fd,buffer,strlen(buffer));*/
+	
 	
 }
 int main(int argc, char **argv)
