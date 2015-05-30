@@ -74,9 +74,8 @@ void handle_socket(int fd)
         }
         }
 		strcpy(fNameBuf,&buffer[5]);
-		sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
-		write(fd,buffer,strlen(buffer));
-		/*
+		
+		
 		if(fNameBuf[0]=='\0')//root
 		{
 			fptr = fopen("index.html","r");
@@ -89,14 +88,21 @@ void handle_socket(int fd)
 					}
 				
 					sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
-					 while ((ret=fread( buffer, BUFSIZE,1 ,fptr))>0) {
+					write(fd,buffer,strlen(buffer));
+					while ((ret=fread( buffer, BUFSIZE,1 ,fptr))>0) {
 					write(fd,buffer,ret);
 					}
 					fclose(fptr);
 					exit(1);
 				
 		}
-		else if(fNameBuf[fNLen-2]=='/')
+		else
+		{
+			sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
+			write(fd,buffer,strlen(buffer));
+			exit(1);
+		}
+		/*else if(fNameBuf[fNLen-2]=='/')
 		{
 			strncpy(fNameBufAppend,fNameBuf,1000);
 			strcat(fNameBufAppend,"/index.html");
