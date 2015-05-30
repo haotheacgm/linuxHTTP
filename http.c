@@ -90,6 +90,8 @@ void handle_socket(int fd)
 					sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
 					write(fd,buffer,strlen(buffer));
 					while ((ret=fread(&buffer, BUFSIZE,1 ,fptr))>0) {
+					sprintf(fNameBuf,"Line:\r\n");
+					write(fd,fNameBuf,strlen(fNameBuf));
 					write(fd,buffer,ret);
 					}
 					fclose(fptr);
