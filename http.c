@@ -62,7 +62,7 @@ void handle_socket(int fd)
 	time(&tm);
 	tms = gmtime(&tm);
 
-	fNLen = strlen(fNameBuf);
+	
 	ret = read(fd,buffer,BUFSIZE);  
     if (ret==0||ret==-1) {
        	exit(3);
@@ -80,8 +80,9 @@ void handle_socket(int fd)
             break;
         }
         }
+
 	strcpy(fNameBuf,&buffer[5]);
-		
+	fNLen = strlen(fNameBuf);
 		
 	if(fNameBuf[0]=='\0')//root
 	{
@@ -91,7 +92,7 @@ void handle_socket(int fd)
 		{
 			sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root %s</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
 			write(fd,buffer,strlen(buffer));
-			exit(1);
+			exit(EXIT_SUCCESS);
 		}
 			
 		sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
@@ -100,7 +101,7 @@ void handle_socket(int fd)
 		write(fd,buffer,ret);
 		}
 		fclose(fptr);
-		exit(1);
+		exit(EXIT_SUCCESS);
 			
 	}
 	
@@ -114,7 +115,7 @@ void handle_socket(int fd)
 		{
 			sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
 			write(fd,buffer,strlen(buffer));
-			exit(1);
+			exit(EXIT_SUCCESS);
 		}
 			
 		sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
@@ -123,7 +124,7 @@ void handle_socket(int fd)
 		write(fd,buffer,ret);
 		}
 		fclose(fptr);
-		exit(1);
+		exit(EXIT_SUCCESS);
 	}
 	/*else
 	{
@@ -143,17 +144,18 @@ void handle_socket(int fd)
 				sprintf(buffer,"HTTP/1.0 301 Moved Permanently\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nLocation: %s/\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
 				//sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found dir</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
 					write(fd,buffer,strlen(buffer));
-				exit(1);
+				exit(EXIT_SUCCESS);
 			}
 		
 		
 			else if(S_ISREG(st.st_mode)) //this name is a file
 			{
-				for(h=0;extensions[j].ext != 0;j++)
+				
+				for(j=0;extensions[j].ext != 0;j++)
 				{
 					 
 					elen = strlen(extensions[j].ext);
-					if(!strncmp(&fNameBuf[buflen-elen], extensions[j].ext, elen)) {
+					if(!strncmp(&fNameBuf[fNLen-elen], extensions[j].ext, elen)) {
 						fstr = extensions[j].filetype;
 						break;
 					}
@@ -164,21 +166,6 @@ void handle_socket(int fd)
 				
 				
 				}
-				/*//printf("a file\n");
-				fptr = fopen(fNameBuf,"r");
-				 
-				if(!fptr)
-				{
-					perror(fNameBuf);
-					sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found file</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
-					write(fd,buffer,strlen(buffer));
-					exit(1);
-				}
-			
-				sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
-				write(fd,buffer,strlen(buffer));
-				fclose(fptr);
-				exit(1);*/
 				
 				fptr = fopen(fNameBuf,"r");
 				
@@ -186,7 +173,7 @@ void handle_socket(int fd)
 				{
 					sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
 					write(fd,buffer,strlen(buffer));
-					exit(1);
+					exit(EXIT_SUCCESS);
 				}
 					
 				sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: %s\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fstr);
@@ -195,18 +182,18 @@ void handle_socket(int fd)
 				write(fd,buffer,ret);
 				}
 				fclose(fptr);
-				exit(1);
+				exit(EXIT_SUCCESS);
 				
 				/*sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n%s\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
 				write(fd,buffer,strlen(buffer));
 				exit(1);*/
 			 }
-		}
+		
 		else
 		{
 			sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found : Can't get file %s</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec,fNameBuf);
 			write(fd,buffer,strlen(buffer));
-			exit(1);
+			exit(EXIT_SUCCESS);
 		}
 		 
 	}
@@ -219,30 +206,40 @@ int main(int argc, char **argv)
 
 {
 
-    int i, listenfd, socketfd;
+    int i, listenfd, socketfd,port;
+    long lport;
     size_t length;
     static struct sockaddr_in cli_addr;
     static struct sockaddr_in serv_addr;
 	pid_t pid, sid;
-
-    /* 背景繼續執行 */
+	
+	if(argc < 3)
+	{
+		printf("Usage: http (port) (directory)\n");
+		exit(EXIT_SUCCESS);
+	}
+	
+	lport = strtol(argv[1],NULL,10);
+    	if(lport<=0 || lport > 65535)
+    	{
+    		printf("ERROR: port out of range.\n");
+		exit(EXIT_SUCCESS);
+    	}
+    	port = (int) lport;
     if(fork() != 0)
         return 0;
 
-    /* 讓父行程不必等待子行程結束 */
     signal(SIGCLD, SIG_IGN);
 
 	sid = setsid();
     if (sid < 0) {
-            /* Log any failure */
             exit(EXIT_FAILURE);
         }
 
 	 printf("SID:%d\n",sid);
-	/* 使用 /tmp 當網站根目錄 */
-    if(chdir("/home/hao/htdoc") == -1){ 
-        printf("ERROR: Can't Change to directory tmp\n");
-        exit(4);
+    if(chdir(argv[2]) == -1){ 
+        printf("ERROR: Can't Change to directory %s\n",argv[2]);
+        exit(EXIT_FAILURE);
     }
 
 	umask(0);
@@ -251,39 +248,31 @@ int main(int argc, char **argv)
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
 
-    /* 開啟網路 Socket */
     if ((listenfd=socket(AF_INET, SOCK_STREAM,0))<0)
-        exit(3);
+        exit(EXIT_FAILURE);
 
-    /* 網路連線設定 */
     serv_addr.sin_family = AF_INET;
-    /* 使用任何在本機的對外 IP */
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    /* 使用 80 Port */
-    serv_addr.sin_port = htons(8080);
+    serv_addr.sin_port = htons(port);
 
-    /* 開啟網路監聽器 */
     if (bind(listenfd, (struct sockaddr *)&serv_addr,sizeof(serv_addr))<0)
-        exit(3);
+        exit(EXIT_FAILURE);
 
-    /* 開始監聽網路 */
     if (listen(listenfd,64)<0)
-        exit(3);
+        exit(EXIT_FAILURE);
 
     while(1) {
         length = sizeof(cli_addr);
-        /* 等待客戶端連線 */
         if ((socketfd = accept(listenfd, (struct sockaddr *)&cli_addr, &length))<0)
-            exit(3);
+            exit(EXIT_FAILURE);
 
-        /* 分出子行程處理要求 */
         if ((pid = fork()) < 0) {
-            exit(3);
+            exit(EXIT_FAILURE);
         } else {
-            if (pid == 0) {  /* 子行程 */
+            if (pid == 0) {  
                 close(listenfd);
                 handle_socket(socketfd);
-            } else { /* 父行程 */
+            } else { 
                 close(socketfd);
             }
         }
