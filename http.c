@@ -116,16 +116,43 @@ void handle_socket(int fd)
 			
 			if(!fptr)
 			{
-				sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
+				/*sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
 				write(fd,buffer,strlen(buffer));
-				exit(EXIT_SUCCESS);
+				exit(EXIT_SUCCESS);*/
+				dptr = opendir(fname);
+				if(!dptr)
+				{
+					sprintf(buffer,"HTTP/1.0 404 Not Found\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n<b>404 Not Found root</b>\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
+					write(fd,buffer,strlen(buffer));
+					exit(EXIT_SUCCESS);
+				}
+				sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
+				write(fd,buffer,strlen(buffer));
+				while(1)
+				{
+					struct dirent *entry;
+					int pathLen;
+					char *dname;
+					char path[1000];
+
+					entry = readdir(dptr);
+					if(!entry)
+						break;
+					dname = entry->d_name;
+					if(strcmp(dname,".") == 0 ||strcmp(dname,"..") == 0)
+						continue;
+					pathLen = snprintf(path, 1000,"<a href = \"%s/%s\">%s</a>" , fname,dname,dname);
+					write(fd,path,strlen(path));
+					/*if(pathLen >= PATH_MAX)
+						exit(EXIT_FAILURE);*/
+			}
+			closedir(dptr);
 			}
 				
-			sprintf(buffer,"HTTP/1.0 200 OK\r\nDate: %s, %d %s %d %d:%d:%d GMT\r\nServer: Apache/2.2.12 (Ubuntu)\r\nConnection: Close\r\nContent-Type: text/html\r\n\r\n\r\n" ,week[tms->tm_wday],tms->tm_mday,month[tms->tm_mon],(1900+tms->tm_year),tms->tm_hour,tms->tm_min,tms->tm_sec);
-			write(fd,buffer,strlen(buffer));
-			while ((ret=fread(&buffer, 1,BUFSIZE ,fptr))>0) {
+			
+			/*while ((ret=fread(&buffer, 1,BUFSIZE ,fptr))>0) {
 			write(fd,buffer,ret);
-			}
+			}*/
 			fclose(fptr);
 			exit(EXIT_SUCCESS);
 		}
